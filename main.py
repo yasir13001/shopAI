@@ -1,11 +1,15 @@
 # app/main.py
 
-from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from app.parser import extract_order_items
-from app.chroma_db import match_products
+from CheckoutGPT.parser import extract_order_items
+from CheckoutGPT.chroma_db import match_products
+from fastapi import FastAPI
 
 app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "CheckoutGPT is up and running!"}
 
 class OrderRequest(BaseModel):
     user_input: str
