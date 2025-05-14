@@ -37,6 +37,7 @@ def match_products(extracted_items):
         if matches['documents']:
             matched_product = matches['documents'][0][0]  # top match
             results.append({
+                "product_id": matches["ids"][0][0],
                 "product_name": matched_product,
                 "quantity": item['quantity']
             })
