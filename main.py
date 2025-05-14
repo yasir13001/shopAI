@@ -1,9 +1,11 @@
 # app/main.py
 
 from pydantic import BaseModel
-from CheckoutGPT.parser import extract_order_items
-from CheckoutGPT.chroma_db import match_products
+from parser import extract_order_items
+from chroma_db import match_products
 from fastapi import FastAPI
+from fastapi import HTTPException
+
 
 app = FastAPI()
 

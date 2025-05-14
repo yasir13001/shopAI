@@ -1,6 +1,21 @@
 # app/parser.py
 
+from pathlib import Path
+import os
+from dotenv import load_dotenv
 import requests
+import json
+import google.generativeai as genai
+
+# Load the environment variables from .env
+dotenv_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path)
+
+# Configure the Gemini API
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# Initialize Gemini Flash model
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 def extract_order_items(user_input):
     prompt = f"""
@@ -17,18 +32,15 @@ Output Format Example:
 Only output JSON. Nothing else.
 """
 
-    # Talk to local Mistral running on Ollama
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": "mistral",
-            "prompt": prompt,
-            "stream": False
-        }
-    )
-    
-    raw_output = response.json()['response']
+    # Get response from Gemini
+    response = model.generate_content(prompt)
+    raw_output = response.text.strip()
 
-    # Parse JSON safely
-    import json
-    return json.loads(raw_output)
+    # Clean up: remove code fences if present
+    if raw_output.startswith("```json"):
+        raw_output = raw_output.strip("```json").strip("```").strip()
+
+    try:
+        return json.loads(raw_output)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to parse JSON: {e}\nRaw Output: {raw_output}")

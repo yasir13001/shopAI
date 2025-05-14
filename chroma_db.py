@@ -1,4 +1,4 @@
-# app/chroma_db.py
+# chroma_db.py
 
 import chromadb
 from sentence_transformers import SentenceTransformer
