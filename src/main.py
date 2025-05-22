@@ -1,8 +1,6 @@
-# app/main.py
-
 from pydantic import BaseModel
-from parser import extract_order_items
-from chroma_db import match_products
+from src.parser import extract_order_items
+from src.chroma_db import match_products
 from fastapi import FastAPI
 from fastapi import HTTPException
 
