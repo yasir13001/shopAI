@@ -1,44 +1,77 @@
 # chroma_db.py
-
+import csv
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+# Initialize
 client = chromadb.Client()
-collection = client.create_collection(name="products")
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+collection = client.get_or_create_collection(name="store_00234_inventory")
 
-# Fake products for demo
-fake_products = [
-    {"product_id": "1", "name": "Oreo Cookies"},
-    {"product_id": "2", "name": "Coca Cola 500ml"},
-    {"product_id": "3", "name": "Almonds Pack 200g"},
-    {"product_id": "4", "name": "Oat Milk 1L"},
-    {"product_id": "5", "name": "Basmati Rice 1kg"}
-]
+def load_csv_to_chroma(csv_path):
+    documents = []
+    ids = []
+    metadatas = []
 
-# Insert fake data into Chroma
-def populate_fake_data():
-    embeddings = embedding_model.encode([p['name'] for p in fake_products])
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            product_name = row["Product_Name"]
+            product_id = row["Product_ID"]
+
+            documents.append(product_name)
+            ids.append(str(product_id))
+            metadatas.append({
+                "Category": row["Catagory"],
+                "Supplier_Name": row["Supplier_Name"],
+                "Stock_Quantity": row["Stock_Quantity"]
+            })
+
+    # Generate embeddings
+    embeddings = embedding_model.encode(documents)
+
+    # Add to Chroma
     collection.add(
-        documents=[p['name'] for p in fake_products],
+        documents=documents,
         embeddings=embeddings.tolist(),
-        ids=[p['product_id'] for p in fake_products]
+        ids=ids,
+        metadatas=metadatas
     )
 
-populate_fake_data()
 
-# Match user-extracted products
-def match_products(extracted_items):
+
+def match_products(extracted_items, collection = collection, top_k=1):
     results = []
     for item in extracted_items:
         query_vector = embedding_model.encode([item['product_name']])
-        matches = collection.query(query_embeddings=query_vector.tolist(), n_results=1)
 
-        if matches['documents']:
-            matched_product = matches['documents'][0][0]  # top match
+        matches = collection.query(
+            query_embeddings=query_vector.tolist(),
+            n_results=top_k
+        )
+
+        if matches['documents'] and matches['ids']:
+            matched_product = matches['documents'][0][0]  # Top match
+            matched_id = matches['ids'][0][0]
+            match_metadata = matches["metadatas"][0][0]
+
+
             results.append({
-                "product_id": matches["ids"][0][0],
+                "product_id": matched_id,
                 "product_name": matched_product,
-                "quantity": item['quantity']
+                "quantity": item['quantity'],
+                "inv_qty": match_metadata["Stock_Quantity"]
+                # Optional: include match distance
+                # "score": matches['distances'][0][0]
             })
+        else:
+            # Optional: include unmatched items
+            results.append({
+                "product_id": None,
+                "product_name": item['product_name'],
+                "quantity": item['quantity'],
+                "note": "No match found"
+            })
+
     return results
+
