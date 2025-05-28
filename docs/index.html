@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CheckoutGPT Order Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      resize: vertical;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #results {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .tile {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+    }
+
+    .tile h3 {
+      margin: 0 0 5px;
+    }
+
+    .tile p {
+      margin: 3px 0;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CheckoutGPT - Order Assistant</h1>
+  <div id="chatbox">
+    <textarea id="orderInput" rows="3" placeholder="Type your order here..."></textarea>
+    <button onclick="submitOrder()">Submit Order</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+       async function submitOrder() {
+            const input = document.getElementById('orderInput').value;
+            const response = await fetch('/parse_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: input })
+            });
+            const data = await response.json();
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+            data.forEach(item => {
+                container.innerHTML += `<div class="tile">
+                    <strong>${item.product_name}</strong><br>
+                    ID: ${item.product_id}<br>
+                    Quantity: ${item.quantity}<br>
+                    In Stock: ${item.inv_qty}
+                </div>`;
+            });
+        }
+  </script>
+
+</body>
+</html>

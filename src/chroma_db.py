@@ -4,11 +4,16 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 # Initialize
-client = chromadb.Client()
+client = chromadb.PersistentClient(path="./chroma_data")
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 collection = client.get_or_create_collection(name="store_00234_inventory")
 
 def load_csv_to_chroma(csv_path):
+    # Only load if the collection is empty
+    if collection.count() > 0:
+        print(f"🟡 ChromaDB already contains {collection.count()} documents. Skipping load.")
+        return
+
     documents = []
     ids = []
     metadatas = []
@@ -38,6 +43,7 @@ def load_csv_to_chroma(csv_path):
         metadatas=metadatas
     )
 
+    print("✅ CSV data loaded into ChromaDB.")
 
 
 def match_products(extracted_items, collection = collection, top_k=1):

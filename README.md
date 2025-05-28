@@ -57,7 +57,7 @@ Replace `your_gemini_api_key_here` with your actual Gemini API key.
 To run the FastAPI server:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn src.main:app --reload
 ```
 
 This will start the application at `http://127.0.0.1:8000`.

@@ -3,19 +3,35 @@ from src.parser import extract_order_items
 from src.chroma_db import match_products, load_csv_to_chroma
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi import Request
+from fastapi.responses import HTMLResponse
+import os
+
+
 
 app = FastAPI()
+
+# Mount the correct static directory
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..","docs")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+@app.get("/checkoutgpt", response_class=HTMLResponse)
+def get_home():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    with open(index_path, "r") as f:
+        return f.read()
+
 
 # Trigger this function on server startup
 @app.on_event("startup")
 def startup_event():
     try:
         load_csv_to_chroma("Store_id_00234.csv")
-        print("✅ CSV data loaded into ChromaDB on server start.")
     except Exception as e:
         print(f"❌ Failed to load CSV data: {e}")
 
-@app.get("/")
+@app.get("/checkoutgpt")
 def read_root():
     return {"message": "CheckoutGPT is up and running!"}
 
