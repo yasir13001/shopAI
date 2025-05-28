@@ -1,114 +1,192 @@
-# CheckoutGPT
+# Checkitout
 
 ## Overview
 
-**CheckoutGPT** is a smart order extraction system built using AI technologies. It processes user input to extract product names and quantities from natural language text, such as order descriptions or receipts, and matches them with actual products stored in a store's inventory. This project uses cutting-edge natural language processing (NLP) models, such as Google's **Gemini 1.5 Flash**, to generate accurate and contextually relevant product matches.
+**Checkitout** is a smart order extraction system powered by AI. It processes natural language input like:
 
-The system is designed to help businesses automate the order processing from various input formats (e.g., invoices, online orders) and integrate them with their inventory management systems.
+> “Order 2 kg Sugar, 5 Black Coffee, 5 Carrots, and 1 litre Milk”
 
-## Features
+to extract product names and quantities, and matches them with items in your store’s inventory.
 
-* **Order Parsing**: Extracts product names and quantities from a given text input using a generative AI model.
-* **Product Matching**: Matches extracted products with a store’s inventory stored in **ChromaDB** for accurate product recommendations.
-* **FastAPI Integration**: Exposes APIs for order parsing and product matching, making it easy to integrate with other systems.
+It uses cutting-edge models such as **Google's Gemini 1.5 Flash** and stores inventory data as vector embeddings in **ChromaDB** for accurate and scalable product matching.
 
-## Tech Stack
+This system is ideal for automating order processing from voice assistants, customer service chatbots, retail systems, or online ordering platforms.
 
-* **FastAPI**: Web framework for building APIs.
-* **Google Gemini 1.5 Flash**: AI model for natural language understanding and generation.
-* **ChromaDB**: Vector database for storing product embeddings and matching them with extracted products.
-* **Pydantic**: Data validation library for request and response models.
+---
 
-## Project Setup
+## ✨ Features
 
-### 1. Clone the repository
+* **Natural Language Order Parsing** – Extracts products and quantities from user text.
+* **Product Matching with Vector Search** – Finds the closest match in your store’s inventory using vector embeddings.
+* **Inventory-aware Matching** – Includes stock quantity in the response.
+* **FastAPI Backend** – RESTful API built for integration into any frontend.
+* **ChromaDB Vector Store** – Persistent embedding storage for fast, similarity-based lookups.
+
+---
+
+## 🛠 Tech Stack
+
+* **FastAPI** – High-performance Python web framework.
+* **Google Gemini 1.5 Flash** – NLP model for text understanding and generation.
+* **ChromaDB** – Vector database to store and query product embeddings.
+* **Pydantic** – FastAPI schema validation.
+* **python-dotenv** – For secure API key management.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/CheckoutGPT.git
-cd CheckoutGPT
+git clone https://github.com/your-username/Checkitout.git
+cd Checkitout
 ```
 
 ### 2. Install Dependencies
 
-Make sure you have Python 3.8+ installed, and then install the required dependencies:
+Make sure Python 3.8+ is installed:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-* `google-generativeai` for connecting with Google's Gemini AI model.
-* `FastAPI` for creating the API.
-* `uvicorn` for running the FastAPI server.
-* `requests` for handling HTTP requests.
-* `python-dotenv` for managing environment variables.
+This installs:
 
-### 3. Set Up API Key
+* `google-generativeai`
+* `fastapi`
+* `uvicorn`
+* `requests`
+* `python-dotenv`
+* `chromadb`
+* Any other required packages
 
-Create a `.env` file in the root of the project and add the following:
+### 3. Set Up Your API Key
+
+Create a `.env` file in the root directory:
 
 ```
 GOOGLE_API_KEY=your_gemini_api_key_here
 ```
 
-Replace `your_gemini_api_key_here` with your actual Gemini API key.
+Replace with your actual Gemini API key.
 
-### 4. Running the Application
+---
 
-To run the FastAPI server:
+### 4. Run the Application
 
 ```bash
 uvicorn src.main:app --reload
 ```
 
-This will start the application at `http://127.0.0.1:8000`.
-
-### 5. API Endpoints
-
-* **GET /**: Test endpoint to check if the server is running.
-
-  Response:
-
-  ```json
-  {
-    "message": "CheckoutGPT is up and running!"
-  }
-  ```
-
-* **POST /parse\_order**: Receives a text input containing an order description and returns a list of extracted items and quantities.
-
-  Example Request:
-
-  ```json
-  {
-    "user_input": "I want to order 2 Oreo Cookies and 1 Coca Cola 500ml"
-  }
-  ```
-
-  Example Response:
-
-  ```json
-  [
-    {"product_name": "Oreo Cookies", "quantity": 2},
-    {"product_name": "Coca Cola 500ml", "quantity": 1}
-  ]
-  ```
-
-## Contributing
-
-If you'd like to contribute to the project:
-
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Visit: [http://127.0.0.1:8000/checkitout](http://127.0.0.1:8000/checkitout)
 
 ---
 
-### Explanation of the Project's Motive:
+## 📡 API Endpoints
 
-The primary purpose of **CheckoutGPT** is to provide a seamless and efficient solution for order extraction and product matching in real-time. It can be integrated into e-commerce platforms, retail businesses, or any system that processes orders manually. By automating the order parsing and matching process, it helps save time, reduce errors, and improve the overall customer experience. 
+### `GET /`
+
+Simple health check.
+
+**Response:**
+
+```json
+{ "message": "Checkitout is up and running!" }
+```
+
+---
+
+### `POST /parse_order`
+
+Sends an order string and receives matched product details from inventory.
+
+**Request:**
+
+```json
+{
+  "user_id": 1,
+  "user_input": "order 2 kg Sugar and 5 Black coffee 5 carrots and 1 litre Milk"
+}
+
+```
+
+**Response:**
+
+```json
+[
+    {
+        "product_id": "40-003-7322",
+        "product_name": "White Sugar",
+        "quantity": 2,
+        "inv_qty": 13
+    },
+    {
+        "product_id": "38-555-9147",
+        "product_name": "Black Coffee",
+        "quantity": 5,
+        "inv_qty": 62
+    },
+    {
+        "product_id": "05-720-8792",
+        "product_name": "Carrot",
+        "quantity": 5,
+        "inv_qty": 80
+    },
+    {
+        "product_id": "00-963-2193",
+        "product_name": "Milk",
+        "quantity": 1,
+        "inv_qty": 43
+    }
+]
+```
+
+---
+
+## 📁 Directory Structure
+
+```
+Checkitout/
+├── LICENSE
+├── README.md
+├── Store_id_00234.csv             # Inventory CSV file
+├── docs/
+│   └── index.html                 # Frontend entry point (for GitHub Pages)
+├── requirements.txt               # Python dependencies
+├── src/
+│   ├── __init__.py                # Makes src a Python package
+│   ├── chroma_db.py               # ChromaDB-related logic
+│   ├── main.py                    # FastAPI server
+│   └── parser.py                  # Order parsing logic
+└── start_server.sh                # Shell script to start the FastAPI server
+```
+
+---
+
+## 🧠 Project Motivation
+
+Manual order entry is slow, error-prone, and inefficient. **Checkitout** automates this process by understanding user input using AI and mapping it directly to your product inventory.
+
+**Use cases include:**
+
+* Retail stores automating sales desk input
+* Voice assistant integration
+* Inventory chatbots
+* E-commerce platforms with smart order handling
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create your feature branch: `git checkout -b my-feature`
+3. Commit changes: `git commit -m 'Add feature'`
+4. Push to your branch: `git push origin my-feature`
+5. Open a Pull Request
+
+---
+
+## 🪪 License
+
+MIT License – see the [LICENSE](LICENSE) file.
