@@ -58,7 +58,7 @@ class ParseOrderResponse(BaseModel):
     items: list[OrderItem]
     session_id: str
 
-@app.post("/parse_order")
+@app.post("/parse_order",summary= "Extracts grocery items from natural language")
 async def parse_order(request: OrderRequest ,  response_model=ParseOrderResponse):
     try:
         # 1. Get or create session ID

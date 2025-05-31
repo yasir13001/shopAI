@@ -1,5 +1,3 @@
-# app/parser.py
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -46,6 +44,7 @@ Only output JSON. Nothing else.
         raise ValueError(f"Failed to parse JSON: {e}\nRaw Output: {raw_output}")
 
 def update(query, instruction):
+
     prompt = f"""
 You are an intelligent bot. 
 instruction: "{instruction}"

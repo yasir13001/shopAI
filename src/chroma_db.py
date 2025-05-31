@@ -119,4 +119,7 @@ def get_chromadb_data(session_id):
                 })
         return items_response, chat_history
 
+# def filter_chat(session_id):
+
+
 
