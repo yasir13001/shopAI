@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from src.parser import extract_order_items,analyse
-from src.chroma_db import match_products, load_csv_to_chroma, store_order_interaction, collection
+from src.parser import extract_order_items, update
+from src.chroma_db import match_products, load_csv_to_chroma, store_order_interaction, collection,get_chromadb_data
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -52,7 +52,6 @@ class OrderItem(BaseModel):
 
 class UpdateOrderRequest(BaseModel):
     session_id: str
-    items: List[OrderItem]
     instruction: str
 
 class ParseOrderResponse(BaseModel):
@@ -86,26 +85,12 @@ async def parse_order(request: OrderRequest ,  response_model=ParseOrderResponse
 def update_order(request: UpdateOrderRequest):
 
     try:
-        current_items = request.items
         instruction = request.instruction
         session_id = request.session_id
 
-        # 🔍 Query ChromaDB using session_id
-        results = collection.get(
-            where={"session_id": session_id}
-        )
-        chat_history = []
-        if results and "metadatas" in results:
-            for metadata in results["metadatas"]:
-                user_msg = metadata.get("user_message")
-                items_response_str = metadata.get("items_response")
-                items_response = json.loads(items_response_str) if items_response_str else []
-                chat_history.append({
-                    "user": user_msg,
-                    "response": items_response
-                })
+        items_response,chat_history = get_chromadb_data(session_id)
         # 🧠 Analyse the instruction with the current items
-        updated_items = analyse(items_response, instruction)
+        updated_items = update(items_response, instruction)
 
         # Optional: store the update instruction + result in ChromaDB if needed
 

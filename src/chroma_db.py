@@ -102,6 +102,21 @@ def store_order_interaction(session_id, user_input, matched_items, collection):
         metadatas=[metadata],
         ids=[str(uuid4())]
     )
-
+def get_chromadb_data(session_id):
+ # 🔍 Query ChromaDB using session_id
+        results = collection.get(
+            where={"session_id": session_id}
+        )
+        chat_history = []
+        if results and "metadatas" in results:
+            for metadata in results["metadatas"]:
+                user_msg = metadata.get("user_message")
+                items_response_str = metadata.get("items_response")
+                items_response = json.loads(items_response_str) if items_response_str else []
+                chat_history.append({
+                    "user": user_msg,
+                    "response": items_response
+                })
+        return items_response, chat_history
 
 

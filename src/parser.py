@@ -45,7 +45,7 @@ Only output JSON. Nothing else.
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to parse JSON: {e}\nRaw Output: {raw_output}")
 
-def analyse(query, instruction):
+def update(query, instruction):
     prompt = f"""
 You are an intelligent bot. 
 instruction: "{instruction}"
