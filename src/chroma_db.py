@@ -2,6 +2,10 @@
 import csv
 import chromadb
 from sentence_transformers import SentenceTransformer
+from uuid import uuid4
+from datetime import datetime
+import json
+
 
 # Initialize
 client = chromadb.PersistentClient(path="./chroma_data")
@@ -80,4 +84,24 @@ def match_products(extracted_items, collection = collection, top_k=1):
             })
 
     return results
+
+
+
+def store_order_interaction(session_id, user_input, matched_items, collection):
+    document = f"User said: {user_input}"
+
+    metadata = {
+        "session_id": session_id,
+        "user_message": user_input,
+        "items_response": json.dumps(matched_items),  # ✅ Serialize to JSON string
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+    collection.add(
+        documents=[document],
+        metadatas=[metadata],
+        ids=[str(uuid4())]
+    )
+
+
 

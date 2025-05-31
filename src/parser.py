@@ -44,3 +44,26 @@ Only output JSON. Nothing else.
         return json.loads(raw_output)
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to parse JSON: {e}\nRaw Output: {raw_output}")
+
+def analyse(query, instruction):
+    prompt = f"""
+You are an intelligent bot. 
+instruction: "{instruction}"
+input: "{query}"
+output format example: 
+[
+        {{"product_id": "38-555-9147","product_name": "Black Coffee","quantity": 5,"inv_qty": 62}}
+]
+Act on instruction and return only the list of items in the given format
+  
+Only output JSON. Nothing else.
+"""
+    # Get response from Gemini
+    response = model.generate_content(prompt)
+    raw_output = response.text.strip()
+
+    # Clean up: remove code fences if present
+    if raw_output.startswith("```json"):
+        raw_output = raw_output.strip("```json").strip("```").strip()
+        
+    return json.loads(raw_output)
