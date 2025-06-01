@@ -54,6 +54,7 @@ output format example:
 [
         {{"product_id": "38-555-9147","product_name": "Black Coffee","quantity": 5,"inv_qty": 62}}
         {{"product_id": "08-396-2704","product_name": "White Sugar","quantity": 2,"inv_qty": "42"}}
+        {{"product_id": "05-720-8792", "product_name": "Carrot","quantity": 5,"inv_qty": "80"}}
 ]
 Act on instruction and return only the list of items in the given format
   
