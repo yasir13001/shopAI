@@ -85,8 +85,6 @@ def match_products(extracted_items, collection = collection, top_k=1):
 
     return results
 
-
-
 def store_order_interaction(session_id, user_input, matched_items, collection):
     document = f"User said: {user_input}"
 

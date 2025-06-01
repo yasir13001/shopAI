@@ -65,36 +65,123 @@
   </style>
 </head>
 <body>
-
+  <input type="text" id="sessionInput" placeholder="Session ID" readonly style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; background:#e9ecef;" />
   <h1>CheckitOut - Your Order Assistant</h1>
   <div id="chatbox">
     <textarea id="orderInput" rows="3" placeholder="Type your order here..."></textarea>
     <button onclick="submitOrder()">Submit Order</button>
+    <button onclick="loadChatHistory()">Update Order</button>
+
 
     <div id="results"></div>
   </div>
 
-  <script>
-       async function submitOrder() {
-            const input = document.getElementById('orderInput').value;
-            const response = await fetch('/parse_order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_input: input })
-            });
-            const data = await response.json();
-            const container = document.getElementById('results');
-            container.innerHTML = '';
-            data.forEach(item => {
-                container.innerHTML += `<div class="tile">
-                    <strong>${item.product_name}</strong><br>
-                    ID: ${item.product_id}<br>
-                    Quantity: ${item.quantity}<br>
-                    In Stock: ${item.inv_qty}
-                </div>`;
-            });
-        }
-  </script>
+<script>
+  window.onload = function () {
+    const savedSessionId = sessionStorage.getItem('sessionId');
+    if (savedSessionId) {
+      document.getElementById('sessionInput').value = savedSessionId;
+    }
+  };
+
+  
+  async function loadChatHistory() {
+    const input = document.getElementById('orderInput').value.trim();
+    const sessionId = sessionStorage.getItem('sessionId');
+
+    if (!sessionId) {
+      alert("No session ID found. Submit an order first.");
+      return;
+    }
+
+    if (!input) {
+      alert('Please enter an instruction, e.g., "load_history"');
+      return;
+    }
+
+    const response = await fetch('/update_order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instruction: input,
+        session_id: sessionId
+      })
+    });
+
+    if (!response.ok) {
+      alert('Failed to load chat history');
+      return;
+    }
+
+    const history = await response.json();
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+
+    history.forEach(entry => {
+      // Display user input
+      const userBlock = document.createElement('div');
+      userBlock.style.gridColumn = '1 / -1';
+      userBlock.style.marginTop = '20px';
+      userBlock.innerHTML = `<strong style="color: #007bff;">User:</strong> ${entry.user}`;
+      container.appendChild(userBlock);
+
+      // Display products
+      entry.response.forEach(item => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerHTML = `
+          <h3>${item.product_name}</h3>
+          <p><strong>ID:</strong> ${item.product_id}</p>
+          <p><strong>Quantity:</strong> ${item.quantity}</p>
+          <p><strong>In Stock:</strong> ${item.inv_qty}</p>
+        `;
+        container.appendChild(tile);
+      });
+    });
+    document.getElementById('orderInput').value = '';
+  }
+
+  async function submitOrder() {
+    const input = document.getElementById('orderInput').value;
+
+    const response = await fetch('/parse_order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_input: input })
+    });
+
+    const data = await response.json(); // This is an array with one element (session object)
+  // Get session id from response and store it
+    const sessionId = data[0]?.['session id'];
+    if (sessionId) {
+      sessionStorage.setItem('sessionId', sessionId);
+      document.getElementById('sessionInput').value = sessionId;
+    }
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+
+    data.forEach(entry => {
+      // Show the user's input
+      container.innerHTML += `
+        <div style="grid-column: 1 / -1; margin-top: 20px;">
+          <strong style="color: #007bff;">User:</strong> ${entry.user}
+        </div>
+      `;
+
+      // Show each product in the response
+      entry.response.forEach(item => {
+        container.innerHTML += `<div class="tile">
+          <h3>${item.product_name}</h3>
+          <p><strong>ID:</strong> ${item.product_id}</p>
+          <p><strong>Quantity:</strong> ${item.quantity}</p>
+          <p><strong>In Stock:</strong> ${item.inv_qty}</p>
+        </div>`;
+      });
+    });
+      // Clear the input field after submitting
+    document.getElementById('orderInput').value = '';
+  }
+</script>
 
 </body>
 </html>
