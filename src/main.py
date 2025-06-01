@@ -73,9 +73,14 @@ async def parse_order(request: OrderRequest ,  response_model=ParseOrderResponse
 
         # 4. Store interaction in ChromaDB
         store_order_interaction(session_id, request.user_input, matched_items, collection)
+        chat_history = get_chromadb_data(session_id)
+
+
+
+
 
         # 5. Return response with session_id (optional enhancement)
-        return {"session_id":session_id,"items": matched_items}
+        return chat_history
 
 
     except Exception as e:
@@ -89,7 +94,7 @@ def update_order(request: UpdateOrderRequest):
         instruction = request.instruction
         session_id = request.session_id
 
-        items_response,chat_history = get_chromadb_data(session_id)
+        chat_history = get_chromadb_data(session_id)
         print(chat_history[-1])
 
         # 🧠 Analyse the instruction with the current items
@@ -100,7 +105,7 @@ def update_order(request: UpdateOrderRequest):
 
 
         # Optional: store the update instruction + result in ChromaDB if needed
-        _,chat_history = get_chromadb_data(session_id)
+        chat_history = get_chromadb_data(session_id)
 
 
         return chat_history

@@ -114,9 +114,10 @@ def get_chromadb_data(session_id):
                 items_response_str = metadata.get("items_response")
                 items_response = json.loads(items_response_str) if items_response_str else []
                 chat_history.append({
+                    "session id": session_id,
                     "user": user_msg,
                     "response": items_response
                 })
-        return items_response, chat_history
+        return chat_history
 
 
