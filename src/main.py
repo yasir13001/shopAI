@@ -11,10 +11,6 @@ import os
 from typing import List, Optional
 import json
 
-
-
-
-
 app = FastAPI()
 
 # Mount the correct static directory
@@ -26,7 +22,6 @@ def get_home():
     index_path = os.path.join(STATIC_DIR, "index.html")
     with open(index_path, "r") as f:
         return f.read()
-
 
 # Trigger this function on server startup
 @app.on_event("startup")
@@ -44,6 +39,7 @@ class OrderRequest(BaseModel):
     user_input: str
     session_id: Optional[str] = None  # Accept session_id from frontend
 
+
 class OrderItem(BaseModel):
     product_id: str
     product_name: str
@@ -59,21 +55,29 @@ class ParseOrderResponse(BaseModel):
     session_id: str
 
 @app.post("/parse_order")
-async def parse_order(request: OrderRequest ,  response_model=ParseOrderResponse):
+async def parse_order(request: OrderRequest):
     try:
         # 1. Get or create session ID
         session_id = request.session_id or str(uuid4())
+        instruction = request.user_input
+
 
         # 2. Extract products and quantities
-        extracted_items = extract_order_items(request.user_input)
+        extracted_items = extract_order_items(instruction)
+        print(extracted_items)
 
         # 3. Match products
         matched_items = match_products(extracted_items)
-
-
-        # 4. Store interaction in ChromaDB
-        store_order_interaction(session_id, request.user_input, matched_items, collection)
         chat_history = get_chromadb_data(session_id)
+
+        if chat_history:
+            chat_history[-1]['response'].append(matched_items)
+            store_order_interaction(session_id, instruction, chat_history, collection)
+        else: 
+            # 4. Store interaction in ChromaDB
+            store_order_interaction(session_id, instruction, matched_items, collection)
+
+            chat_history = get_chromadb_data(session_id)
 
         # 5. Return response with session_id (optional enhancement)
         return chat_history
@@ -98,10 +102,8 @@ def update_order(request: UpdateOrderRequest):
         # 4. Store interaction in ChromaDB
         store_order_interaction(session_id,instruction, updated_items, collection)
 
-
         # Optional: store the update instruction + result in ChromaDB if needed
         chat_history = get_chromadb_data(session_id)
-
 
         return chat_history
     except Exception as e:

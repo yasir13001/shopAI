@@ -84,7 +84,6 @@
     }
   };
 
-  
   async function loadChatHistory() {
     const input = document.getElementById('orderInput').value.trim();
     const sessionId = sessionStorage.getItem('sessionId');
@@ -112,7 +111,6 @@
       alert('Failed to load chat history');
       return;
     }
-
     const history = await response.json();
     const container = document.getElementById('results');
     container.innerHTML = '';
@@ -147,7 +145,9 @@
     const response = await fetch('/parse_order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_input: input })
+      body: JSON.stringify({
+        user_input: input,
+      })
     });
 
     const data = await response.json(); // This is an array with one element (session object)
