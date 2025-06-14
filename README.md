@@ -14,6 +14,11 @@ This system is ideal for automating order processing from voice assistants, cust
 
 ---
 
+### 📽 Demo Video
+
+🎬 [Click here to watch the demo](assets/demo.mp4)
+
+
 ## ✨ Features
 
 * **Natural Language Order Parsing** – Extracts products and quantities from user text.
