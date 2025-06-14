@@ -16,7 +16,7 @@ This system is ideal for automating order processing from voice assistants, cust
 
 ### 📽 Demo Video
 
-🎬 [Click here to watch the demo](assets/demo.mov)
+🎬 [Click here to watch the demo](assets/demo.mp4)
 
 
 ## ✨ Features
