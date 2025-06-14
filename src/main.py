@@ -14,10 +14,10 @@ import json
 app = FastAPI()
 
 # Mount the correct static directory
-STATIC_DIR = os.path.join(os.path.dirname(__file__), "..","docs")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..",".")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-@app.get("/checkitout", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def get_home():
     index_path = os.path.join(STATIC_DIR, "index.html")
     with open(index_path, "r") as f:
@@ -31,7 +31,7 @@ def startup_event():
     except Exception as e:
         print(f"❌ Failed to load CSV data: {e}")
 
-@app.get("/checkitout")
+@app.get("/checkitout/")
 def read_root():
     return {"message": "Checkitout is up and running!"}
 
