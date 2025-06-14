@@ -1,8 +1,8 @@
-# Checkitout
+# ShopAI
 
 ## Overview
 
-**Checkitout** is a smart order extraction system powered by AI. It processes natural language input like:
+**ShopAI** is a smart order extraction system powered by AI. It processes natural language input like:
 
 > “Order 2 kg Sugar, 5 Black Coffee, 5 Carrots, and 1 litre Milk”
 
@@ -39,8 +39,8 @@ This system is ideal for automating order processing from voice assistants, cust
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Checkitout.git
-cd Checkitout
+git clone https://github.com/your-username/ShopAI.git
+cd ShopAI
 ```
 
 ### 2. Install Dependencies
@@ -79,7 +79,7 @@ Replace with your actual Gemini API key.
 uvicorn src.main:app --reload
 ```
 
-Visit: [http://127.0.0.1:8000/checkitout](http://127.0.0.1:8000/checkitout)
+Visit: [http://127.0.0.1:8000/shopai](http://127.0.0.1:8000/shopai)
 
 ---
 
@@ -92,7 +92,7 @@ Simple health check.
 **Response:**
 
 ```json
-{ "message": "Checkitout is up and running!" }
+{ "message": "ShopAI is up and running!" }
 ```
 
 ---
@@ -108,7 +108,6 @@ Sends an order string and receives matched product details from inventory.
   "user_id": 1,
   "user_input": "order 2 kg Sugar and 5 Black coffee 5 carrots and 1 litre Milk"
 }
-
 ```
 
 **Response:**
@@ -147,7 +146,7 @@ Sends an order string and receives matched product details from inventory.
 ## 📁 Directory Structure
 
 ```
-Checkitout/
+ShopAI/
 ├── LICENSE
 ├── README.md
 ├── Store_id_00234.csv             # Inventory CSV file
@@ -166,7 +165,7 @@ Checkitout/
 
 ## 🧠 Project Motivation
 
-Manual order entry is slow, error-prone, and inefficient. **Checkitout** automates this process by understanding user input using AI and mapping it directly to your product inventory.
+Manual order entry is slow, error-prone, and inefficient. **ShopAI** automates this process by understanding user input using AI and mapping it directly to your product inventory.
 
 **Use cases include:**
 
