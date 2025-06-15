@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from src.parser import extract_order_items, update
-from src.chroma_db import match_products, load_csv_to_chroma, store_order_interaction, collection,get_chromadb_data
+from src.chroma_db import match_products, load_csv_to_chroma, store_order_interaction,get_chromadb_data,chat_collection
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -64,7 +64,6 @@ async def parse_order(request: OrderRequest):
 
         # 2. Extract products and quantities
         extracted_items = extract_order_items(instruction)
-        print(extracted_items)
 
         # 3. Match products
         matched_items = match_products(extracted_items)
@@ -72,10 +71,10 @@ async def parse_order(request: OrderRequest):
 
         if chat_history:
             chat_history[-1]['response'].append(matched_items)
-            store_order_interaction(session_id, instruction, chat_history, collection)
+            store_order_interaction(session_id, instruction, chat_history, chat_collection)
         else: 
             # 4. Store interaction in ChromaDB
-            store_order_interaction(session_id, instruction, matched_items, collection)
+            store_order_interaction(session_id, instruction, matched_items, chat_collection)
 
             chat_history = get_chromadb_data(session_id)
 
@@ -100,7 +99,7 @@ def update_order(request: UpdateOrderRequest):
         updated_items = update(chat_history[-1]["response"], instruction)
 
         # 4. Store interaction in ChromaDB
-        store_order_interaction(session_id,instruction, updated_items, collection)
+        store_order_interaction(session_id,instruction, updated_items, chat_collection)
 
         # Optional: store the update instruction + result in ChromaDB if needed
         chat_history = get_chromadb_data(session_id)

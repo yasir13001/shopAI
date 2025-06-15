@@ -10,12 +10,16 @@ import json
 # Initialize
 client = chromadb.PersistentClient(path="./chroma_data")
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-collection = client.get_or_create_collection(name="store_00234_inventory")
+
+# Separate collections
+inventory_collection = client.get_or_create_collection(name="store_001")
+chat_collection = client.get_or_create_collection(name="store_001_chat_history")
+
 
 def load_csv_to_chroma(csv_path):
     # Only load if the collection is empty
-    if collection.count() > 0:
-        print(f"🟡 ChromaDB already contains {collection.count()} documents. Skipping load.")
+    if inventory_collection.count() > 0:
+        print(f"🟡 ChromaDB already contains {inventory_collection.count()} documents. Skipping load.")
         return
 
     documents = []
@@ -40,7 +44,7 @@ def load_csv_to_chroma(csv_path):
     embeddings = embedding_model.encode(documents)
 
     # Add to Chroma
-    collection.add(
+    inventory_collection.add(
         documents=documents,
         embeddings=embeddings.tolist(),
         ids=ids,
@@ -50,7 +54,7 @@ def load_csv_to_chroma(csv_path):
     print("✅ CSV data loaded into ChromaDB.")
 
 
-def match_products(extracted_items, collection = collection, top_k=1):
+def match_products(extracted_items, collection = inventory_collection, top_k=1):
     results = []
     for item in extracted_items:
         query_vector = embedding_model.encode([item['product_name']])
@@ -85,7 +89,7 @@ def match_products(extracted_items, collection = collection, top_k=1):
 
     return results
 
-def store_order_interaction(session_id, user_input, matched_items, collection):
+def store_order_interaction(session_id, user_input, matched_items, collection=chat_collection):
     document = f"User said: {user_input}"
 
     metadata = {
@@ -102,7 +106,7 @@ def store_order_interaction(session_id, user_input, matched_items, collection):
     )
 def get_chromadb_data(session_id):
  # 🔍 Query ChromaDB using session_id
-        results = collection.get(
+        results = chat_collection.get(
             where={"session_id": session_id}
         )
         chat_history = []
