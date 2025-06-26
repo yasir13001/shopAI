@@ -106,6 +106,8 @@ Simple health check.
 
 Sends an order string and receives matched product details from inventory.
 
+This route **adds new items** to the current order list for the given user. It does not remove or update existing items in the list.
+
 **Request:**
 
 ```json
@@ -120,30 +122,152 @@ Sends an order string and receives matched product details from inventory.
 ```json
 [
     {
-        "product_id": "40-003-7322",
-        "product_name": "White Sugar",
-        "quantity": 2,
-        "inv_qty": 13
-    },
-    {
-        "product_id": "38-555-9147",
-        "product_name": "Black Coffee",
-        "quantity": 5,
-        "inv_qty": 62
-    },
-    {
-        "product_id": "05-720-8792",
-        "product_name": "Carrot",
-        "quantity": 5,
-        "inv_qty": 80
-    },
-    {
-        "product_id": "00-963-2193",
-        "product_name": "Milk",
-        "quantity": 1,
-        "inv_qty": 43
+        "session id": "580320b5-5dcb-4721-8383-223d1388c41c",
+        "user": "add 5 kg Milk, 1 kg Flour, 2 pack of Coffee, and 1 kg Sugar",
+        "response": [
+            {
+                "product_id": "37-606-0510",
+                "product_name": "Milk",
+                "quantity": 5,
+                "inv_qty": "18"
+            },
+            {
+                "product_id": "05-334-2923",
+                "product_name": "Bread Flour",
+                "quantity": 1,
+                "inv_qty": "14"
+            },
+            {
+                "product_id": "57-562-2358",
+                "product_name": "Black Coffee",
+                "quantity": 2,
+                "inv_qty": "37"
+            },
+            {
+                "product_id": "22-141-9798",
+                "product_name": "White Sugar",
+                "quantity": 1,
+                "inv_qty": "47"
+            }
+        ]
     }
 ]
+```
+This route **adds new items** to the existing order list for the given user.
+
+**Request:**
+
+```json
+{
+  "user_id": 1,
+  "user_input": "add Cucumber and 5 oranges",
+  "session_id": "580320b5-5dcb-4721-8383-223d1388c41c"
+}
+```
+
+**Response:**
+
+```json
+ {
+        "session id": "580320b5-5dcb-4721-8383-223d1388c41c",
+        "user": "add Cucumber and 5 oranges",
+        "response": [
+            {
+                "product_id": "37-606-0510",
+                "product_name": "Milk",
+                "quantity": 5,
+                "inv_qty": "18"
+            },
+            {
+                "product_id": "05-334-2923",
+                "product_name": "Bread Flour",
+                "quantity": 1,
+                "inv_qty": "14"
+            },
+            {
+                "product_id": "57-562-2358",
+                "product_name": "Black Coffee",
+                "quantity": 2,
+                "inv_qty": "37"
+            },
+            {
+                "product_id": "22-141-9798",
+                "product_name": "White Sugar",
+                "quantity": 1,
+                "inv_qty": "47"
+            },
+            {
+                "product_id": "76-340-4432",
+                "product_name": "Cucumber",
+                "quantity": 1,
+                "inv_qty": "19"
+            },
+            {
+                "product_id": "76-540-6407",
+                "product_name": "Orange",
+                "quantity": 5,
+                "inv_qty": "92"
+            }
+        ]
+    }
+```
+
+---
+
+### `POST /update_order`
+
+Updates an existing order by modifying quantities, removing items, or changing the item list entirely.
+
+This route **replaces** the user's current order list with the new one provided. It allows for full updates: modifying quantities, removing unwanted items.
+
+**Request:**
+
+```json
+{
+    "session_id": "580320b5-5dcb-4721-8383-223d1388c41c",
+    "instruction": "remove Sugar"
+}
+```
+
+**Response:**
+
+```json
+ {
+        "session id": "580320b5-5dcb-4721-8383-223d1388c41c",
+        "user": "add Cucumber and 5 oranges",
+        "response": [
+            {
+                "product_id": "37-606-0510",
+                "product_name": "Milk",
+                "quantity": 5,
+                "inv_qty": "18"
+            },
+            {
+                "product_id": "05-334-2923",
+                "product_name": "Bread Flour",
+                "quantity": 1,
+                "inv_qty": "14"
+            },
+            {
+                "product_id": "57-562-2358",
+                "product_name": "Black Coffee",
+                "quantity": 2,
+                "inv_qty": "37"
+            },
+            {
+                "product_id": "76-340-4432",
+                "product_name": "Cucumber",
+                "quantity": 1,
+                "inv_qty": "19"
+            },
+            {
+                "product_id": "76-540-6407",
+                "product_name": "Orange",
+                "quantity": 5,
+                "inv_qty": "92"
+            }
+        ]
+    }
 ```
 
 ---
@@ -155,8 +279,7 @@ ShopAI/
 ├── LICENSE
 ├── README.md
 ├── Store_id_00234.csv             # Inventory CSV file
-├── docs/
-│   └── index.html                 # Frontend entry point (for GitHub Pages)
+├── index.html                     # Frontend entry point (for GitHub Pages)
 ├── requirements.txt               # Python dependencies
 ├── src/
 │   ├── __init__.py                # Makes src a Python package
