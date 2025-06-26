@@ -100,7 +100,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        instruction: input,
+        user_input: input,
         session_id: sessionId
       })
     });
@@ -118,7 +118,7 @@
       const userBlock = document.createElement('div');
       userBlock.style.gridColumn = '1 / -1';
       userBlock.style.marginTop = '20px';
-      userBlock.innerHTML = `<strong style="color: #007bff;">User:</strong> ${entry.user}`;
+      userBlock.innerHTML = `<strong style="color: #007bff;">User:</strong> ${entry.user_message}`;
       container.appendChild(userBlock);
 
       // Display products
@@ -136,7 +136,7 @@
     });
     document.getElementById('orderInput').value = '';
   }
-
+  
   async function submitOrder() {
     const input = document.getElementById('orderInput').value.trim();
     if (!input) {
@@ -167,7 +167,7 @@
 
     // 2️⃣  Parse the reply and store the *new* session id (if provided)
     const data = await response.json();           // your API returns an array
-    const newSessionId = data[0]?.['session id']; // adjust the key if needed
+    const newSessionId = data[0]?.['session_id']; // adjust the key if needed
 
     if (newSessionId) {
       sessionStorage.setItem('sessionId', newSessionId);
@@ -181,7 +181,7 @@
     data.forEach(entry => {
       container.innerHTML += `
         <div style="grid-column: 1 / -1; margin-top: 20px;">
-          <strong style="color: #007bff;">User:</strong> ${entry.user}
+          <strong style="color: #007bff;">User:</strong> ${entry.user_message}
         </div>
       `;
 

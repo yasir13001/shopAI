@@ -36,7 +36,6 @@ class OrderRequest(BaseModel):
     user_input: str
     session_id: Optional[str] = None  # Accept session_id from frontend
 
-
 class OrderItem(BaseModel):
     product_id: str
     product_name: str
@@ -44,8 +43,8 @@ class OrderItem(BaseModel):
     inv_qty: int 
 
 class UpdateOrderRequest(BaseModel):
+    user_input: str
     session_id: str
-    instruction: str
 
 @app.post("/parse_order")
 async def parse_order(request: OrderRequest):
@@ -53,7 +52,6 @@ async def parse_order(request: OrderRequest):
         # 1. Get or create session ID
         session_id = request.session_id or str(uuid4())
         instruction = request.user_input
-
 
         # 2. Extract products and quantities
         extracted_items = extract_order_items(instruction)
@@ -87,7 +85,7 @@ async def parse_order(request: OrderRequest):
 def update_order(request: UpdateOrderRequest):
 
     try:
-        instruction = request.instruction
+        instruction = request.user_input
         session_id = request.session_id
 
         chat_history = get_chromadb_data(session_id)
@@ -104,5 +102,3 @@ def update_order(request: UpdateOrderRequest):
         return chat_history
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
