@@ -70,13 +70,17 @@ async def parse_order(request: OrderRequest):
         chat_history = get_chromadb_data(session_id)
 
         if chat_history:
-            chat_history[-1]['response'].append(matched_items)
-            store_order_interaction(session_id, instruction, chat_history, chat_collection)
+            last_chat = chat_history[-1]['response']
+            for item in matched_items:
+                item = json.dumps(item, indent=4)
+                parsed = json.loads(item)
+                last_chat.append(parsed)
+            store_order_interaction(session_id, instruction, last_chat, chat_collection)
         else: 
             # 4. Store interaction in ChromaDB
             store_order_interaction(session_id, instruction, matched_items, chat_collection)
 
-            chat_history = get_chromadb_data(session_id)
+        chat_history = get_chromadb_data(session_id)
 
         # 5. Return response with session_id (optional enhancement)
         return chat_history
@@ -107,3 +111,5 @@ def update_order(request: UpdateOrderRequest):
         return chat_history
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
