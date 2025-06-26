@@ -17,10 +17,11 @@ app = FastAPI()
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..",".")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+
 @app.get("/", response_class=HTMLResponse)
 def get_home():
     index_path = os.path.join(STATIC_DIR, "index.html")
-    with open(index_path, "r") as f:
+    with open(index_path, "r", encoding="utf-8") as f:
         return f.read()
 
 # Trigger this function on server startup
@@ -30,10 +31,6 @@ def startup_event():
         load_csv_to_chroma("Store_id_00234.csv")
     except Exception as e:
         print(f"❌ Failed to load CSV data: {e}")
-
-@app.get("/checkitout/")
-def read_root():
-    return {"message": "Checkitout is up and running!"}
 
 class OrderRequest(BaseModel):
     user_input: str
@@ -49,10 +46,6 @@ class OrderItem(BaseModel):
 class UpdateOrderRequest(BaseModel):
     session_id: str
     instruction: str
-
-class ParseOrderResponse(BaseModel):
-    items: list[OrderItem]
-    session_id: str
 
 @app.post("/parse_order")
 async def parse_order(request: OrderRequest):
