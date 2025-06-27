@@ -10,8 +10,20 @@ from uuid import uuid4
 import os
 from typing import List, Optional
 import json
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+
+# Allow requests from any origin (you can restrict this in production)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific origins if needed
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods, including OPTIONS
+    allow_headers=["*"],  # Allows all headers
+)
 
 # Mount the correct static directory
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..",".")
@@ -46,7 +58,7 @@ class UpdateOrderRequest(BaseModel):
     user_input: str
     session_id: str
 
-@app.post("/parse_order")
+@app.post("/shopai/parse_order")
 async def parse_order(request: OrderRequest):
     try:
         # 1. Get or create session ID
@@ -81,7 +93,7 @@ async def parse_order(request: OrderRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/update_order")
+@app.post("/shopai/update_order")
 def update_order(request: UpdateOrderRequest):
 
     try:

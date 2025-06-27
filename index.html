@@ -96,7 +96,7 @@
       return;
     }
 
-    const response = await fetch('/update_order', {
+    const response = await fetch('/shopai/update_order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -154,7 +154,7 @@
     }
 
     // Send the request
-    const response = await fetch('/parse_order', {
+    const response = await fetch('/shopai/parse_order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
